@@ -5,10 +5,7 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'Net::BF2S',
     VERSION_FROM      => 'lib/Net/BF2S.pm', # finds $VERSION
-    PREREQ_PM         => { 'XML::Simple' => "2.14", # probably could use an older version
-			   'LWP::Simple' => "1.41", # probably could use an older version
-			   'Data::Dumper' => "2.121", # probably could use an older version
-			  },
+    PREREQ_PM         => {'WWW::BF2S' => "0"},
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Net/BF2S.pm', # retrieve abstract from module
        AUTHOR         => 'Dusty Wilson <bf2s-module@dusty.hey.nu>') : ()),

@@ -1,13 +1,11 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Net-BF2S
-version:      0.02
+version:      0.03
 version_from: lib/Net/BF2S.pm
 installdirs:  site
 requires:
-    Data::Dumper:                  2.121
-    LWP::Simple:                   1.41
-    XML::Simple:                   2.14
+    WWW::BF2S:                     0
 
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version 6.30

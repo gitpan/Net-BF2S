@@ -1,5 +1,12 @@
 Net::BF2S Changes:
 
+  *** DON'T USE NET::BF2S: use WWW::BF2S instead. ***
+
+  0.03 - Mon May 22 20:26:34 UTC 2006 - Dusty Wilson
+  Renamed to WWW:BF2S (was Net::BF2S).
+    Updated module package name.
+    Updated documentation.
+
   0.02 - Mon May 22 05:34:05 UTC 2006 - Dusty Wilson
   Modified documentation:
     Fixed documentation bugs (exposed E<lt>gtE<gt>).
