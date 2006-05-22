@@ -1,6 +1,6 @@
 package Net::BF2S;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use XML::Simple;
 use Data::Dumper;
@@ -147,23 +147,110 @@ Net::BF2S - Get Battlefield 2 Player Stats
 
 Fetches Battlefield 2 player stats from BF2S.
 
-You must use the PID (player ID) when requesting stats.  If you try to request the player stats by player name, the module will ignore it.  You can get the PID from many sources, including the BF2S.com website.
+You must use the PID (player ID) when requesting stats.  If you try to request the player stats by player name, the module will ignore it and move on to the next one in the list.  You can get the PID from many sources, including the BF2S.com website.
 
-You can only make THREE requests for data in a SIX hour period.  This is a restriction from the feed provider, not of the module.  Try to ask for as much information as possible in one request.  The module (not yet) is written in a way that will try to include a list of "candidates" (a list of PIDs that you've asked for before, but you didn't ask for this time around) that will also be requested in that same request, which is meant to update your local player stat cache when possible.
+You can only make THREE requests for data in a SIX hour period.  This is a restriction from the feed provider, not the module.  Try to ask for as many PIDs as possible in one request.  The module is being written (this part is coming soon) in a way that will try to include a list of "PID Request Candidates" (a list of PIDs that you've asked for before, but you didn't ask for this time around) that will also be requested in that same request, which is meant to update your local player Stat Cache when possible.
 
 I'll provide more documentation later.
 
+=head2 getStats
+
+Access this method in an OO way.
+
+  my $data = $bf2->getStats(65431962,64246757,64661842);
+
+It will return a hashref that contains data for the PIDs requested.  It is in this format:
+
+  $data = {
+             '65431962' => {
+                            'country' => 'US',
+                            'link' => 'http://bf2s.com/player/65431962/',
+                            'time' => '525400',
+                            'deaths' => '5332',
+                            'nick' => 'Rd54321',
+                            'score' => '9757',
+                            'wins' => '222',
+                            'losses' => '368',
+                            'pid' => '65431962',
+                            'updated' => 1148275361,
+                            'rank' => '6',
+                            'kills' => '3237'
+                          },
+            '64246757' => {
+                            'country' => 'US',
+                            'link' => 'http://bf2s.com/player/64246757/',
+                            'time' => '272092',
+                            'deaths' => '1739',
+                            'nick' => 'dustyheynu',
+                            'score' => '5076',
+                            'wins' => '76',
+                            'losses' => '110',
+                            'pid' => '64246757',
+                            'updated' => 1148275361,
+                            'rank' => '5',
+                            'kills' => '1130'
+                          },
+            '64661842' => {
+                            'country' => 'US',
+                            'link' => 'http://bf2s.com/player/64661842/',
+                            'time' => '1008165',
+                            'deaths' => '11902',
+                            'nick' => 'READYORNOTHEREICOME',
+                            'score' => '29062',
+                            'wins' => '550',
+                            'losses' => '689',
+                            'pid' => '64661842',
+                            'updated' => 1148275361,
+                            'rank' => '8',
+                            'kills' => '8757'
+                          }
+          };
+
+It will only fetch data that is at least two hours old.  Otherwise, it will serve the data from the stat cache file.
+
+If none of the PIDs need updated (already updated within two hours), it won't send a request at all and only serve from the cache.
+
+If at least one of the PIDs need updated (because it's older than two hours or has never been requested), it will request those PIDs that need updated.  When the "PID Request Candidates" feature is ready, it will also request, at that same time, a list of "candidates" from your stat cache.
+
+=head2 BF2S Data Source Restrictions
+
+Because the BF2S data source limits a single IP address to only three requests in a six hours, each request needs to be used properly.  Basically, you can only make a request once every two hours.  The PID Request Candidates feature is here to help, or at least try.
+
+For each request, data for a maximum of 64 PIDs will be returned.
+
+=head2 Stats Cache
+
+The Stats Cache (stored locally automatically) collects, combines, and stores results from every request made to the BF2S data source.  If used properly, you can use this module to make requests as often as you wish (used directly on a website, for example), and unless the data in the cache has reached a certain age, every request can be served via the Stats Cache.  This means that you can let this module handle the caching and you can use it as if you were asking a live source each time.
+
+=head2 PID Request Candidates
+
+(This is a feature that is not yet included.  It is top priority and should be added to the next update.)
+
+To make the most of the Stats Cache, every time the module deems it necessary to make a request out to the BF2S data source, it also includes, in addition to the requested PIDs, a list of other PIDs found in the Stats Cache that could be updated.
+
+If less than the maximum number of PIDs are being requested by your application, it will include as many PIDs from your Stats Cache as possible (max 64 total).  It will add those in order of needing-updated-ness.  If your number of requested PIDs and the total size of your Stats Cache is smaller than the 64 max, it will just refresh your entire Stats Cache as well as include any new PIDs that weren't already in your cache.
+
+The getStats method will still only return the PIDs you requested.  This feature will simply update your cached PIDs at the same time.
+
 =head1 SEE ALSO
 
-Uses data feed from Jeff Minard's BF2S MyLeaderBoard API E<lt>http://jrm.cc/extras/mlb/readme.html<gt>.
+Uses data feed from Jeff Minard's BF2S MyLeaderBoard API E<lt>http://jrm.cc/extras/mlb/readme.htmlE<gt>.
 
 =head1 TODO
 
-Need to finish the "candidates" list functionality.
+Need to finish the PID Request Candidates list functionality.
 
 =head1 CHANGES
 
-0.01 - Sun May 21 21:52:31 2006 - Dusty Wilson
+  0.02 - Mon May 22 05:34:05 UTC 2006 - Dusty Wilson
+  Modified documentation:
+    Fixed documentation bugs (exposed E<lt>gtE<gt>).
+    Added information about the getData method.
+    Added information about the BF2S Data Source Restrictions.
+    Added information about the Stats Cache.
+    Added information about the PID Request Candidates.
+
+  0.01 - Sun May 21 21:52:31 UTC 2006 - Dusty Wilson
   New module with basic functionality.
 
 =head1 BUGS
@@ -172,11 +259,11 @@ There probably are some.  Let me know what you find.
 
 =head1 AUTHOR
 
-Dusty Wilson, E<lt>bf2s-module@dusty.hey.nu<gt>
+Dusty Wilson, E<lt>bf2s-module@dusty.hey.nuE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2006 by Dusty Wilson E<lt>http://dusty.hey.nu/<gt>
+Copyright (C) 2006 by Dusty Wilson E<lt>http://dusty.hey.nu/E<gt>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
